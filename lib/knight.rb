@@ -10,6 +10,15 @@ class Knight
     @y = 1
   end
 
+  def moves_to_space(current_x_y, destination_x_y)
+    moves = move_array_to_space(current_x_y, destination_x_y)
+    puts "It took #{moves.length - 1} move#{moves.length >= 3 ? "s" : ""} to get from #{moves[0]} to #{moves[-1]}."
+    puts "Here's the path it took: #{moves}"
+    moves
+  end
+
+  private
+
   def move_options(current_x, current_y)
     opt1 = [current_x + 2, current_y + 1]
     opt2 = [current_x + 2, current_y - 1]
@@ -25,51 +34,38 @@ class Knight
     valid_options.uniq
   end
 
-  def move_count_to_space(current_x_y, destination_x_y, iteration_count = 0)
+  def move_array_to_space(current_x_y, destination_x_y, visited_spaces = [current_x_y])
     possible_moves = move_options(current_x_y[0], current_x_y[1])
     return_array = []
     possible_moves.each do |move|
-      return 1 if move == destination_x_y
-      return false if iteration_count > 5
-      return_array.push(move_count_to_space(move, destination_x_y, iteration_count + 1) ? move_count_to_space(move, destination_x_y, iteration_count + 1) + 1 : false)
+      return visited_spaces + [move] if move == destination_x_y
+      next if visited_spaces.include?(move) && visited_spaces.length > 1 || visited_spaces.length > 6
+      return_array.push(move_array_to_space(move, destination_x_y, visited_spaces + [move]) ? (move_array_to_space(move, destination_x_y, visited_spaces + [move])) : false)
     end
-    return_array.delete(false)
-    return_array.empty? ? false : return_array.min
+    shortest_array(return_array)
   end
 
-  def move_count_to_space_a(current_x, current_y, destination_x, destination_y, iteration_count = 0)
-    possible_moves = move_options(current_x, current_y)
-    return_array = []
-    possible_moves.each do |move|
-      return 1 if move == [destination_x, destination_y]
-      return false if iteration_count > 5
-      return_array.push(move_count_to_space_a(move[0], move[1], destination_x, destination_y, iteration_count + 1) ? move_count_to_space_a(move[0], move[1], destination_x, destination_y, iteration_count + 1) + 1 : false)
+  def shortest_array(arr)
+    arr.delete(false)
+    if arr.empty?
+      false
+    else
+      return_array = arr[0]
+      arr.each do |internal_array|
+        return_array = internal_array if internal_array.length < return_array.length
+      end
+      return_array
     end
-    return_array.delete(false)
-    return_array.empty? ? false : return_array.min
   end
 
-  def move_count_to_space2(current_x_y, destination_x_y, visited_spaces = [current_x_y])
-    p visited_spaces
-    possible_moves = move_options(current_x_y[0], current_x_y[1])
-    return_array = []
-    possible_moves.each do |move|
-      return 1 if move == destination_x_y
-      return false if visited_spaces.include?(move) && visited_spaces.length > 1
-      return_array.push(move_count_to_space2(move, destination_x_y, visited_spaces + [move]) ? (move_count_to_space2(move, destination_x_y, visited_spaces + [move]) + 1) : false)
-    end
-    return_array.delete(false)
-    return_array.empty? ? false : return_array.min
-  end
-
-  def move_count_to_space3(current_x_y, destination_x_y, visited_spaces = [current_x_y])
-    #p visited_spaces
+  #old function that just returns number of moves, not move list
+  def move_count_to_space_a(current_x_y, destination_x_y, visited_spaces = [current_x_y])
     possible_moves = move_options(current_x_y[0], current_x_y[1])
     return_array = []
     possible_moves.each do |move|
       return 1 if move == destination_x_y
       next if visited_spaces.include?(move) && visited_spaces.length > 1 || visited_spaces.length > 6
-      return_array.push(move_count_to_space3(move, destination_x_y, visited_spaces + [move]) ? (move_count_to_space3(move, destination_x_y, visited_spaces + [move]) + 1) : false)
+      return_array.push(move_count_to_space_a(move, destination_x_y, visited_spaces + [move]) ? (move_count_to_space_a(move, destination_x_y, visited_spaces + [move]) + 1) : false)
     end
     return_array.delete(false)
     return_array.empty? ? false : return_array.min
