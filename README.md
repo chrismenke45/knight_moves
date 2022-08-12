@@ -1,1 +1,1 @@
-This project is a precursor to creating a chess game.  In it, I will make a fucntion that finds a way to move a night from one space on an empty chess board to another in as few moves as possible.
+This project is a precursor to creating a chess game.  In it, I will make a function that finds a way to move a knight from one space to another on an empty chess board to another in as few moves as possible.
